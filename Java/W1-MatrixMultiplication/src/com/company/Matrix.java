@@ -5,22 +5,23 @@ import java.util.Scanner;
 public class Matrix {
     private int row;
     private int column;
-    private String size;
     private int[][] theMatrix;
 
-    //initiate a new matrix by typing values
+    //Constructor 1: initiate a new matrix by random values
     public Matrix(int row, int column){
         this.row = row;
         this.column = column;
         this.theMatrix = new int[row][column];
-        System.out.println("Please type in " + row + " x " + column + " matrix : ");
         Scanner keyboard = new Scanner(System.in);
+        System.out.println("Enter largest integer in the matrix: ");
+        int max = keyboard.nextInt();
+
         for(int i = 0; i < row; i++)
             for(int j = 0; j < column; j++)
-                theMatrix[i][j] = keyboard.nextInt();
+                theMatrix[i][j] =(int) (Math.random()*max+1);
     }
 
-    //initiate a new matrix by given array
+    //Constructor 2: initiate a new matrix by given array
     public Matrix(int[][] given){
         this.row = given.length;
         this.column=given[0].length;
