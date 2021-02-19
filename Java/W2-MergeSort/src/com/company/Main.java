@@ -129,15 +129,15 @@ public class Main {
 
 
     /*Merge sort Method 1:
-    * calling recursive from 0 to length-1
-    * temp array is the unsorted smaller array before merging
+    * calling recursive from 0 to length
+    * temp array is the unsorted smaller arrays before merging
     */
     public static void mergeSort1(int[] arr){
         mergeSort(arr, 0, arr.length); //Call the recursive version
     }
 
 
-    //Recursive merge sort of array a from positions start to end (included)
+    //Recursive merge sort of array a from positions start to end ("end" not-included)
     private static void mergeSort(int[] a, int start, int end){
 
         //Recursive case: if array has > 1 item
