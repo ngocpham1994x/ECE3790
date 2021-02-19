@@ -6,6 +6,7 @@ package com.company;
 import org.ejml.simple.SimpleMatrix;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -13,12 +14,13 @@ public class Main {
         //random integer value
         System.out.println("Matrix A (m-rows,p-columns) x Matrix B (p-rows, n-columns) = Matrix C (m-rows, n-columns). \nEnter size of matrices (m,p,n values): ");
         Scanner keyboard = new Scanner(System.in);
+//        int size = keyboard.nextInt();  //for consistent testing
 
         int m = keyboard.nextInt(); //matrix A rows
         int p = keyboard.nextInt(); //matrix A columns = matrix B rows
         int n = keyboard.nextInt(); //matrix B columns
 
-        long startTime, endTime, elapsedTime;
+        double startTime, endTime, elapsedTimeBuiltIn, elapsedTimeMethod;
 
         System.out.println("Enter largest integer value in the matrix: ");
         int max = keyboard.nextInt();
@@ -32,30 +34,36 @@ public class Main {
         System.out.println(toString(matrixB));
 
 
+        System.out.println("Result matrix from built-in EJML library:");
 
-
-        //#1 Labor work: Matrix Multiplication
-        startTime = System.nanoTime();
-        double[][] matrixC = multiply(matrixA,matrixB);
-        endTime = System.nanoTime();
-        elapsedTime = endTime - startTime;
-        System.out.println(toString(matrixC));
-        System.out.println("Elapsed time: "+ elapsedTime + " nanoseconds");
-
-
-
-
-
-        //#2 Using Matrix Library:
+        //#1 Using Matrix Library:
         SimpleMatrix firstMatrix = new SimpleMatrix(matrixA);
         SimpleMatrix secondMatrix = new SimpleMatrix(matrixB);
         startTime = System.nanoTime();
         SimpleMatrix productMatrix = firstMatrix.mult(secondMatrix);
         endTime = System.nanoTime();
-        elapsedTime = endTime - startTime;
+        elapsedTimeBuiltIn =  (endTime - startTime) / (Math.pow(10,9));  // nanoseconds to seconds
 
         System.out.println(productMatrix.toString());
-        System.out.println("Elapsed time: "+ elapsedTime + " nanoseconds");
+
+
+
+
+        System.out.println("Result matrix from programed method:");
+
+        //#2 Manual work: Matrix Multiplication
+        startTime = System.nanoTime();
+        double[][] matrixC = multiply(matrixA,matrixB);
+        endTime = System.nanoTime();
+        elapsedTimeMethod =  (endTime - startTime) / (Math.pow(10,9));  // nanoseconds to seconds
+        System.out.println(toString(matrixC));
+
+
+
+
+
+        System.out.println("Elapsed time using Built-in: " + elapsedTimeBuiltIn + " seconds");
+        System.out.println("Elapsed time using Method: "+ elapsedTimeMethod + " seconds");
 
     } //main
 
@@ -90,6 +98,7 @@ public class Main {
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++)
                 matrix[i][j] = Math.round((Math.random()*maxValue+1));
+//                matrix[i][j] = 1;  //for consistent testing
         }
 
         return matrix;

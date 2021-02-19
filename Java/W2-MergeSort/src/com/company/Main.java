@@ -14,8 +14,7 @@ public class Main {
         System.out.println("Please enter largest integer in the array: ");
         int max = keyboard.nextInt();
 
-        long startTime, endTime, elapsedTime;
-
+        double startTime, endTime, elapsedTimeBuiltIn, elapsedTimeMethod;
 
 
 
@@ -25,23 +24,7 @@ public class Main {
             theArray1[i]=(int) (Math.random()*max+1);
 
         int[] theArray2 = new int[theArray1.length];
-        System.arraycopy(theArray1, 0, theArray2,0, theArray1.length);
-
-
-
-
-
-
-
-        System.out.println("\nStudent's method \nNon-sorted array: \n"+Arrays.toString(theArray1));
-
-        //#1 Labor work: in-place mergesort array
-        startTime = System.nanoTime();
-        mergeSort(theArray1);
-        endTime = System.nanoTime();
-        elapsedTime = endTime-startTime;
-        System.out.println("Sorted array: \n"+Arrays.toString(theArray1));
-        System.out.println("Elapsed time: "+elapsedTime);
+        System.arraycopy(theArray1, 0, theArray2,0, theArray1.length); //deep copy
 
 
 
@@ -50,13 +33,36 @@ public class Main {
 
         System.out.println("\nBuilt-in method \nNon-sorted array: \n"+Arrays.toString(theArray2));
 
-        //#2 Built-in library for sorting ascending order
+        //#1 Built-in library for sorting ascending order
         startTime = System.nanoTime();
         Arrays.sort(theArray1);
         endTime = System.nanoTime();
-        elapsedTime = endTime-startTime;
+        elapsedTimeBuiltIn = (endTime-startTime)/(Math.pow(10,9));
         System.out.println("Sorted array: \n"+Arrays.toString(theArray1));
-        System.out.println("Elapsed time: "+elapsedTime);
+
+        System.out.println("Is the array successfully sorted? " + isSorted(theArray1));
+
+
+
+
+        System.out.println("\nStudent's method \nNon-sorted array: \n"+Arrays.toString(theArray2));
+
+        //#2 Labor work: in-place mergesort array
+        startTime = System.nanoTime();
+        mergeSort1(theArray2);
+        endTime = System.nanoTime();
+        elapsedTimeMethod = (endTime-startTime)/(Math.pow(10,9));
+        System.out.println("Sorted array: \n"+Arrays.toString(theArray2));
+
+        System.out.println("Is the array successfully sorted? " + isSorted(theArray2));
+
+
+
+
+        System.out.println();
+        System.out.println("Elapsed time using built-in: "+elapsedTimeBuiltIn+" seconds");
+        System.out.println("Elapsed time using method: "+elapsedTimeMethod+" seconds");
+
 
 
     } //main
@@ -65,7 +71,7 @@ public class Main {
 
 
 
-    /*Merge sort Method 2:
+    /*Merge sort Method :
      * calling recursive from 0 to length
      * temp array is a blank array to put the merged array in, the deep copy to original array
      */
@@ -110,6 +116,14 @@ public class Main {
     } // end merge
 
 
+	//utility to test if array is successfully sorted 
+    public static String isSorted(int[] array) {
+        for (int i = 0; i < array.length - 1; i++) {
+            if (array[i] > array[i + 1])
+                return "No";
+        }
+        return "Yes";
+    }
 
 
 
@@ -118,50 +132,56 @@ public class Main {
     * calling recursive from 0 to length-1
     * temp array is the unsorted smaller array before merging
     */
-//    public static void mergeSort(int[] arr){
-//        mergeSort(arr, 0, arr.length-1); //Call the recursive version
-//    }
-//
-//
-//    //Recursive merge sort of array a from positions lo to hi (included)
-//    private static void mergeSort(int[] a, int start, int end){
-//        //base case: when 1 or 0 element in the array
-//        if(end<=start) return;
-//
-//        //1. Divide: Sort two separate halves of temp, using merge sorts
-//        int mid = (start+end)/2;
-//        //2. Conquer:
-//        mergeSort(a,start,mid);
-//        mergeSort(a,mid+1,end);
-//        //3. Combine: Merge the two sorted pieces together
-//        merge(a, start, end);
-//    }
-//
-//
-//
-//
-//
-//    //Merging the elements (of temp array) on the left-hand and on the right-hand, write to the original array (in-place)
-//    //arr = the original array
-//    //temp = unsorted array, different size as original array
-//    private static void merge(int[] arr, int start, int end){
-//        int[] temp = new int[end-start+1];
-//        System.arraycopy(arr, start, temp, 0, end-start+1);  //copying the values of unsorted to a temp array
-//
-//        int currL = 0; //index that will move through the first half of temp
-//        int midOfTemp = (end-start)/2;  //mid here is the middle of the temp array
-//        int currR = midOfTemp + 1; //index that will move through the second half of temp
-//        int currIndexInArr = 0;  //keeps track of the number of positions in original array
-//
-//        while (currL <= midOfTemp && currR < temp.length) {
-//            if (temp[currL] <= temp[currR])
-//                arr[start + currIndexInArr++] = temp[currL++]; //Overwriting the original array
-//            else
-//                arr[start + currIndexInArr++] = temp[currR++]; //Overwriting the original array
-//        }
-//        while (currL <= midOfTemp)
-//            arr[start + currIndexInArr++] = temp[currL++];  // if some numbers are left in the first half, copy all of them
-//    }
+    public static void mergeSort1(int[] arr){
+        mergeSort(arr, 0, arr.length); //Call the recursive version
+    }
+
+
+    //Recursive merge sort of array a from positions start to end (included)
+    private static void mergeSort(int[] a, int start, int end){
+
+        //Recursive case: if array has > 1 item
+        if ((end - start) > 1) {
+            //1. Divide: Sort two separate halves of temp, using merge sorts
+            int mid = start + (end - start) / 2;
+            //2. Conquer:
+            mergeSort(a, start, mid);
+            mergeSort(a, mid, end);
+            //3. Combine: Merge the two sorted pieces together
+            merge(a, start, mid, end);
+        }
+
+        //base case: when 1 or 0 element in the array
+    }
+
+
+
+
+
+    //Merging the elements (of temp array) on the left-hand and on the right-hand, write to the original array (in-place)
+    //arr = the original array
+    //temp = unsorted array, different size as original array
+    private static void merge(int[] arr, int start, int mid, int end){
+        int[] leftArray = new int[mid - start];
+        int[] rightArray = new int[end - mid];
+        System.arraycopy(arr, start, leftArray, 0, mid - start);  //copying the values of unsorted to a "left" array
+        System.arraycopy(arr, mid, rightArray, 0, end - mid);  //copying the values of unsorted to a "right" array
+
+        int currL = 0;  //index that will move through the first half
+        int currR = 0;  //index that will move through the second half
+        int currIndexInArr = 0; //keeps track of the number of positions in return array
+
+        while (currL < leftArray.length && currR < rightArray.length) {
+            if (leftArray[currL] <= rightArray[currR])
+                arr[start + currIndexInArr++] = leftArray[currL++]; //Overwriting the original array
+            else
+                arr[start + currIndexInArr++] = rightArray[currR++]; //Overwriting the original array
+        }
+        while (currL < leftArray.length)
+            arr[start + currIndexInArr++] = leftArray[currL++];  // if some numbers are left in the first half, copy all of them
+    }
+
+
 
 
 }
