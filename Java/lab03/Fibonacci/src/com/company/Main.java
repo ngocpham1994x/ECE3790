@@ -13,23 +13,26 @@ public class Main {
         long start_recursive = System.nanoTime();
         result_recursive = recursiveFibonacci(n);
         long end_recursive = System.nanoTime();
-        System.out.println("Recursive time = " + (end_recursive - start_recursive));
 
         long start_memoized = System.nanoTime();
         result_memozied = memoizedFibonacci(n);
         long end_memoized = System.nanoTime();
-        System.out.println("Memozied time = " + (end_memoized - start_memoized));
 
         long start_bottomUp = System.nanoTime();
         result_bottomUp = bottomupFibonacci(n);
         long end_bottomUp = System.nanoTime();
-        System.out.println("Bottom-up time = " + (end_bottomUp - start_bottomUp));
 
+        System.out.println("Recursive time = " + (end_recursive - start_recursive) + " nanosecs");
         System.out.println("Recursive result = " + result_recursive);
+
+        System.out.println("Memozied time = " + (end_memoized - start_memoized) + " nanosecs");
         System.out.println("Top down memoized result = " + result_memozied);
+
+        System.out.println("Bottom-up time = " + (end_bottomUp - start_bottomUp) + " nanosecs");
         System.out.println("Bottom up table result = " + result_bottomUp);
     }
 
+    //naive recursive approach
     public static int recursiveFibonacci(int n){
         if (n <= 1)
             return n;
@@ -43,6 +46,7 @@ public class Main {
         return result;
     }
 
+    //top down + memoized approach
     public static int memoizedFibonacci(int[] memo,int n) {
         if (n <= 1)
             return memo[n] = n;
@@ -53,6 +57,7 @@ public class Main {
 
     }
 
+    //bottom up + table approach
     public static int bottomupFibonacci(int n) {
         int[] table = new int[n + 1];
         for (int i = 0; i <= n; i++) {
