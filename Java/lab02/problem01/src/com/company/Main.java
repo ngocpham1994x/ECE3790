@@ -45,5 +45,5 @@ public class Main {
 
         return cost;
     }
-
+// not continue due to passing function as an argument to function. This lab is completed in Matlab
 }
