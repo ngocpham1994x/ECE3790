@@ -93,8 +93,8 @@ public class Main {
     public static void printLCS(String X, String Y, int m, int n,int[][] memo){
         int sequenceLength = memo[m-1][n-1];
         char[] commonSequence = new char[sequenceLength];
-        int i = m-1;
-        int j = n-1;
+        int i = m-1; //for traversing in memo
+        int j = n-1; //for traversing in memo
 
         //start from bottom right of the 2D array memo
         while(i >= 0 && j >= 0){
