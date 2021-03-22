@@ -8,15 +8,15 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        int problemSize = 1000;
+        int problemSize = 10; //n, number of matrices
         int[] matrixSize = new int[problemSize];
 
         for(int i = 0; i < problemSize; i++)
             matrixSize[i] = 10;
 
-//        long start_recursive = System.nanoTime();
-//        int cost_recursive = recursiveMCM(matrixSize,1,matrixSize.length-1);
-//        long end_recursive = System.nanoTime();
+        long start_recursive = System.nanoTime();
+        int cost_recursive = recursiveMCM(matrixSize,1,matrixSize.length-1);
+        long end_recursive = System.nanoTime();
 
         long start_memoized = System.nanoTime();
         int cost_memoized = memoizedMCM(matrixSize,1,matrixSize.length-1);
@@ -27,8 +27,8 @@ public class Main {
         long end_bottomUp = System.nanoTime();
 
         System.out.println();
-//        System.out.println("Recursive time = " + (end_recursive - start_recursive)/(Math.pow(10,9)) + " secs");
-//        System.out.println("Recursive cost = " + cost_recursive);
+        System.out.println("Recursive time = " + (end_recursive - start_recursive)/(Math.pow(10,9)) + " secs");
+        System.out.println("Recursive cost = " + cost_recursive);
 
         System.out.println("Memoized time = " + (end_memoized - start_memoized)/(Math.pow(10,9)) + " secs");
         System.out.println("Memoized cost = " + cost_memoized);
