@@ -71,7 +71,7 @@ public class Main {
     public static int memoizedMCM(int[] matrixSize, int start, int end, int[][] memo){
         int cost, costLeft, costRight;
         if(start == end)
-            return 0;
+            return memo[start][end] = 0;
         else if (memo[start][end] != -1)
             return memo[start][end];
         else {
