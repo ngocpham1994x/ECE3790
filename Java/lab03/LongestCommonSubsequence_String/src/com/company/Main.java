@@ -117,7 +117,7 @@ public class Main {
             else
                 j--;
         }
-        System.out.println(Arrays.toString(commonSequence));
+        System.out.println(Arrays.toString(commonSequence)); //printing LCS
     }
 }
 
