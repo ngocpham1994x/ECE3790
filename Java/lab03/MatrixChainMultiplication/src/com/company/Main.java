@@ -122,6 +122,10 @@ public class Main {
         return table[1][matrixSize.length-1];
     }
 
+
+    //printing result from either top-down approach (memo) or bottom-up approach (table)
+    //by uncomment the codes for printing in specific approach
+    //results are the same for both approaches
     public static void parenthesizeMCM(int start, int end, int n, int[][] memo){
         if (start == end) {
             System.out.print("A" + name++);
