@@ -5,10 +5,10 @@ import java.util.Arrays;
 public class Main {
 //0 1 1 2 3 5 8 13 21 34 55 89 144 233 ...
     public static void main(String[] args) {
-        int result_recursive = 0;
-        int result_memozied = 0;
-        int result_bottomUp = 0;
-        int n = 30;
+        long result_recursive = 0;
+        long result_memozied = 0;
+        long result_bottomUp = 0;
+        int n = 15;
 
         long start_recursive = System.nanoTime();
         result_recursive = recursiveFibonacci(n);
@@ -22,32 +22,32 @@ public class Main {
         result_bottomUp = bottomupFibonacci(n);
         long end_bottomUp = System.nanoTime();
 
-        System.out.println("Recursive time = " + (end_recursive - start_recursive) + " nanosecs");
+        System.out.println("Recursive time = " + (end_recursive - start_recursive)/(Math.pow(10,9)) + " secs");
         System.out.println("Recursive result = " + result_recursive);
 
-        System.out.println("Memozied time = " + (end_memoized - start_memoized) + " nanosecs");
+        System.out.println("Memozied time = " + (end_memoized - start_memoized)/(Math.pow(10,9)) + " secs");
         System.out.println("Top down memoized result = " + result_memozied);
 
-        System.out.println("Bottom-up time = " + (end_bottomUp - start_bottomUp) + " nanosecs");
+        System.out.println("Bottom-up time = " + (end_bottomUp - start_bottomUp)/(Math.pow(10,9)) + " secs");
         System.out.println("Bottom up table result = " + result_bottomUp);
     }
 
     //naive recursive approach
-    public static int recursiveFibonacci(int n){
+    public static long recursiveFibonacci(int n){
         if (n <= 1)
             return n;
         else
             return recursiveFibonacci(n-1) + recursiveFibonacci(n-2);
     }
-    public static int memoizedFibonacci(int n){
-        int[] memo = new int[n+1];
-        int result = memoizedFibonacci(memo,n);
+    public static long memoizedFibonacci(int n){
+        long[] memo = new long[n+1];
+        long result = memoizedFibonacci(memo,n);
 //        System.out.println(Arrays.toString(memo));
         return result;
     }
 
     //top down + memoized approach
-    public static int memoizedFibonacci(int[] memo,int n) {
+    public static long memoizedFibonacci(long[] memo,int n) {
         if (n <= 1)
             return memo[n] = n;
         else if (memo[n] != 0)
@@ -58,8 +58,8 @@ public class Main {
     }
 
     //bottom up + table approach
-    public static int bottomupFibonacci(int n) {
-        int[] table = new int[n + 1];
+    public static long bottomupFibonacci(int n) {
+        long[] table = new long[n + 1];
         for (int i = 0; i <= n; i++) {
             if (i <= 1)
                 table[i] = i;

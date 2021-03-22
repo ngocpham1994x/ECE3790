@@ -8,12 +8,15 @@ public class Main {
 
     public static void main(String[] args) {
 	// write your code here
-        int[] matrixSize = new int[]{10, 20, 30, 40, 30};//,10, 20, 30, 40, 30,10,20,30};
+        int problemSize = 1000;
+        int[] matrixSize = new int[problemSize];
 
+        for(int i = 0; i < problemSize; i++)
+            matrixSize[i] = 10;
 
-        long start_recursive = System.nanoTime();
-        int cost_recursive = recursiveMCM(matrixSize,1,matrixSize.length-1);
-        long end_recursive = System.nanoTime();
+//        long start_recursive = System.nanoTime();
+//        int cost_recursive = recursiveMCM(matrixSize,1,matrixSize.length-1);
+//        long end_recursive = System.nanoTime();
 
         long start_memoized = System.nanoTime();
         int cost_memoized = memoizedMCM(matrixSize,1,matrixSize.length-1);
@@ -24,13 +27,13 @@ public class Main {
         long end_bottomUp = System.nanoTime();
 
         System.out.println();
-        System.out.println("Recursive time = " + (end_recursive - start_recursive) + " nanosecs");
-        System.out.println("Recursive cost = " + cost_recursive);
+//        System.out.println("Recursive time = " + (end_recursive - start_recursive)/(Math.pow(10,9)) + " secs");
+//        System.out.println("Recursive cost = " + cost_recursive);
 
-        System.out.println("Memoized time = " + (end_memoized - start_memoized) + " nanosecs");
+        System.out.println("Memoized time = " + (end_memoized - start_memoized)/(Math.pow(10,9)) + " secs");
         System.out.println("Memoized cost = " + cost_memoized);
 
-        System.out.println("Bottom up tim = " + (end_bottomUp - start_bottomUp) + " nanosecs");
+        System.out.println("Bottom up time = " + (end_bottomUp - start_bottomUp)/(Math.pow(10,9)) + " secs");
         System.out.println("Bottom up cost = " + cost_bottomUp);
     }
 
@@ -115,7 +118,7 @@ public class Main {
             }
         }
 
-
+        //for printing out the parenthesis
 //        System.out.println(Arrays.toString(table));
 //        name = 'A';
 //        parenthesizeMCM(1, matrixSize.length - 1 , matrixSize.length, table);
