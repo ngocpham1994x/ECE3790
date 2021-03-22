@@ -8,10 +8,10 @@ public class Main {
 
     public static void main(String[] args) {
         // write your code here
-        String X = "AGGTAB15txyz2904";
-        String Y = "GTAB5y04";
-        int m = X.length();
-        int n = Y.length();
+        int[] X = new int[]{1,2,3,4,5,6};
+        int[] Y = new int[]{1,1,5,4,3,2};
+        int m = X.length;
+        int n = Y.length;
 
 
         long start_recursive = System.nanoTime();
@@ -38,16 +38,16 @@ public class Main {
     }
 
 
-    public static int recursiveLCS(String X, String Y, int m, int n){
+    public static int recursiveLCS(int[] X, int[] Y, int m, int n){
         if (m == 0 || n == 0)
             return 0;
-        else if (X.charAt(m-1) == Y.charAt(n-1))
+        else if (X[m-1] == Y[n-1])
             return (1 + recursiveLCS(X,Y,m-1,n-1));
         else
             return Math.max(recursiveLCS(X,Y,m-1, n), recursiveLCS(X,Y,m,n-1));
     }
 
-    public static int memoizedLCS(String X, String Y, int m, int n) {
+    public static int memoizedLCS(int[] X, int[] Y, int m, int n) {
         int[][] memo = new int[m][n];
 
         for (int i = 0; i < m; i++)
@@ -62,25 +62,25 @@ public class Main {
     }
 
 
-    public static int memoizedLCS(String X, String Y, int m, int n, int[][] memo){
+    public static int memoizedLCS(int[] X, int[] Y, int m, int n, int[][] memo){
         if (m == 0 || n == 0)
             return 0;
         else if (memo[m-1][n-1] != -1)
             return memo[m-1][n-1];
-        else if (X.charAt(m-1) == Y.charAt(n-1))
+        else if (X[m-1] == Y[n-1])
             return memo[m-1][n-1] = (1 + memoizedLCS(X,Y,m-1,n-1,memo));
         else
             return memo[m-1][n-1] = Math.max(memoizedLCS(X,Y,m-1, n,memo), memoizedLCS(X,Y,m,n-1,memo));
     }
 
     //bottom up approach
-    public static int bottomUpLCS(String X, String Y, int m, int n){
+    public static int bottomUpLCS(int[] X, int[] Y, int m, int n){
         int[][] table = new int[m+1][n+1]; //extra 1 column, 1 row for storing empty string
         for(int i = 0; i <= m; i++){
             for(int j = 0; j <= n; j++){
                 if (i == 0 || j == 0)
                     table[i][j] = 0;  //common subsequence with an empty string is 0
-                else if(X.charAt(i-1) == Y.charAt(j-1)) //"- 1" due to examining the Strings, not the table. So subtract the first column, first row (storing empty strings) for extracting actual two strings
+                else if(X[i-1] == Y[j-1]) //"- 1" due to examining the Strings, not the table. So subtract the first column, first row (storing empty strings) for extracting actual two strings
                     table[i][j] = 1 + table[i-1][j-1] ;  //1 + common of past sub-problems
                 else    //two chars not match
                     table[i][j] = Math.max(table[i-1][j], table[i][j-1]); //max of two sub-problems
@@ -89,22 +89,29 @@ public class Main {
         return table[m][n];
     }
 
-
-    public static void printLCS(String X, String Y, int m, int n,int[][] memo){
+    // printing result below can be shortened if printing from bottom-up approach
+    // (does not have to copy "table" over for scenario which first chars of each string are common -> (j-1) = "Index out of bound" )
+    public static void printLCS(int[] X, int[] Y, int m, int n,int[][] memo){
         int sequenceLength = memo[m-1][n-1];
-        char[] commonSequence = new char[sequenceLength];
-        int i = m-1;
-        int j = n-1;
+        int[] commonSequence = new int[sequenceLength];
 
-        //start from bottom right of the 2D array memo
-        while(i >= 0 && j >= 0){
-            if(X.charAt(i) == Y.charAt(j)){
-                commonSequence[sequenceLength-1] = X.charAt(i);
+        //copy "table", first column - first row = 0's
+        int[][] table = new int[m+1][n+1];
+        for(int i = 1; i < (m+1); i++)
+            System.arraycopy(memo[i-1],0,table[i],1,memo[i-1].length);
+
+        int i = m; //for traversing in table
+        int j = n; //for traversing in table
+
+        //start from bottom right of the 2D array table
+        while(i > 0 && j > 0){
+            if(X[i-1] == Y[j-1]){
+                commonSequence[sequenceLength-1] = X[i-1];
                 i--;
                 j--;
                 sequenceLength--;
             }
-            else if (memo[i-1][j] > memo[i][j-1])
+            else if (table[i-1][j] > table[i][j-1])
                 i--;
             else
                 j--;

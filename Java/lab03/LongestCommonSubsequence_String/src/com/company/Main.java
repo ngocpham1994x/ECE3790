@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         // write your code here
         String X = "AGGTAB15txyz2904";
-        String Y = "GTAB5y04";
+        String Y = "ATAB5y04";
         int m = X.length();
         int n = Y.length();
 
@@ -90,21 +90,29 @@ public class Main {
     }
 
 
+    // printing result below can be shortened if printing from bottom-up approach
+    // (does not have to copy "table" over for scenario which first chars of each string are common -> (j-1) = "Index out of bound" )
     public static void printLCS(String X, String Y, int m, int n,int[][] memo){
         int sequenceLength = memo[m-1][n-1];
         char[] commonSequence = new char[sequenceLength];
-        int i = m-1; //for traversing in memo
-        int j = n-1; //for traversing in memo
 
-        //start from bottom right of the 2D array memo
-        while(i >= 0 && j >= 0){
-            if(X.charAt(i) == Y.charAt(j)){
-                commonSequence[sequenceLength-1] = X.charAt(i);
+        //copy "table", first column - first row = 0's
+        int[][] table = new int[m+1][n+1];
+        for(int i = 1; i < (m+1); i++)
+            System.arraycopy(memo[i-1],0,table[i],1,memo[i-1].length);
+
+        int i = m; //for traversing in table
+        int j = n; //for traversing in table
+
+        //start from bottom right of the 2D array table
+        while(i > 0 && j > 0){
+            if(X.charAt(i-1) == Y.charAt(j-1)){
+                commonSequence[sequenceLength-1] = X.charAt(i-1);
                 i--;
                 j--;
                 sequenceLength--;
             }
-            else if (memo[i-1][j] > memo[i][j-1])
+            else if (table[i-1][j] > table[i][j-1])
                 i--;
             else
                 j--;
