@@ -1,3 +1,4 @@
+import bitstring as bitstring
 import numpy as np
 import sys
 import math
@@ -72,11 +73,15 @@ def getfilecharactercounts(filename):
 
     f.close()
     
-    #Code Missing: mark and delete any characters that don't occur in the file
+    #mark and delete any characters that don't occur in the file
     #i.e., nodes should be as long as the number of unique characters in the file (not 256 things long)
     #Hint: Eliminate zero counts, sorting may help.
 
-
+    nodes.sort(key=operator.attrgetter('count'))
+    nodes = [item for item in nodes if item.count != 0];
+    # for item in nodes:
+    #     print(item)
+    # print(len(nodes))
     return nodes
 
 
@@ -87,7 +92,17 @@ def createhuffmantree(huffmannodes):
     node_heap = copy.deepcopy(huffmannodes)  #first create a copy
     heapq.heapify(node_heap)                 #create heap
 
-    #Code Missing: Create the Huffman Node Tree using the Min Priority Queue (heap)
+    #Create the Huffman Node Tree using the Min Priority Queue (heap)
+    for item in range(len(node_heap)-1):
+        nodeleft = heapq.heappop(node_heap)
+        noderight = heapq.heappop(node_heap)
+
+        nodeparent = HuffmanNode(bytes([0]))
+        nodeparent.count = nodeleft.count + noderight.count
+        nodeparent.left = nodeleft
+        nodeparent.right = noderight
+
+        heapq.heappush(node_heap, nodeparent)
 
     return heapq.heappop(node_heap) #final node is the tree we want
 
@@ -119,9 +134,9 @@ def listhuffmancodes(huffmantreenode, codelist):
 
 def huffmanencodefile(filename):
     """ Read and Encode a File using Huffman Codes"""
-        
+
     counts = getfilecharactercounts(filename) #get the counts from the file
-        
+
     huffmantree = createhuffmantree(counts) #create and encode the characters
     codehuffmantree(huffmantree,bitstring.BitString())
 
@@ -130,9 +145,9 @@ def huffmanencodefile(filename):
 
     for i in range(0,256):
         if codelist[i] != None:
-            print("character ", chr(i), " maps to code ", codelist[i].bin)
-    
-    
+            print(i, "character ", chr(i), " maps to code ", codelist[i].bin)
+
+
     #encode the file
     with open(filename, 'rb') as f:
         filecode = bitstring.BitString()
@@ -146,21 +161,99 @@ def huffmanencodefile(filename):
 
 
     #write the file
+    #Write the bitstring (and any additional information necessary) to file
+
+    #INCORRECT COMPRESSION:
+    # with open(filename + "WRONG.huf", 'wb') as coded_file:
+    #     coded_file.write(bytearray(filecode.bin,"utf8"))
+
+    def pad_encoded_text(encoded_text):
+        extra_padding = 8 - len(encoded_text) % 8
+        for i in range(extra_padding):
+            encoded_text += "0"                     #pad at the end
+
+        padded_info = "{0:08b}".format(extra_padding)
+        encoded_text = padded_info + encoded_text   #pad at front
+        return encoded_text
+
+    def get_byte_array(padded_encoded_text):
+        if(len(padded_encoded_text) % 8 != 0):
+            print("Encoded text not padded properly")
+            exit(0)
+
+        the_byte = bytearray()
+        for i in range(0, len(padded_encoded_text), 8):
+            byte = padded_encoded_text[i:i+8]
+            the_byte.append(int(byte, 2))
+        return the_byte
+
     with open(filename + ".huf", 'wb') as coded_file:
-        #Code Missing: Write the bitstring (and any additional information necessary) to file
+        encoded_text = filecode.bin
+        padded_encoded_text = pad_encoded_text(encoded_text)
+        byte_encoded_text = get_byte_array(padded_encoded_text)
+        coded_file.write(bytes(byte_encoded_text))
 
 
-def huffmandecodefile(filename):
+    return huffmantree
+
+
+
+def huffmandecodefile(filename, huffmantree):
     """ Decode a Huffman-Coded File"""
-    #Code Missing:
+    # huffmantreecopy = huffmantree
+    """ functions for decompression: """
+    # print(huffmantree)
+
+    def remove_padding(padded_encoded_text):
+        padded_info = padded_encoded_text[:8]
+        extra_padding = int(padded_info, 2)
+
+        padded_encoded_text = padded_encoded_text[8:]
+        encoded_text = padded_encoded_text[:-1*extra_padding]
+
+        return encoded_text
+
+    def decode_text(encoded_text, huffmantree):
+        # current_code = ""
+        decoded_text = ""
+        current_node = huffmantree
+
+        for bit in encoded_text:
+            if bit == '0':
+                current_node = current_node.left
+            else:
+                current_node = current_node.right
+
+            if(current_node.left == [] and current_node.right == []):
+                decoded_text += chr(current_node.index)
+                current_node = huffmantree
+
+        return decoded_text
+
+
+    with open(filename, 'rb') as f:
+        bitstring = ""
+        while True:
+            byte = f.read(1)
+            if byte:
+                byte = list(byte)[0]                # byte to decimal (or integer)
+                bits = bin(byte)[2:].rjust(8, '0')  # decimal to bitstring. remove "0b" and adjust for enough 8 bits of 1 byte
+                bitstring += bits;
+            else:
+                break #eof
+
+    with open(filename + "DECODED.rtf", 'wb') as decoded_file:
+        encoded_text = remove_padding(bitstring)
+        decompressed_text = decode_text(encoded_text, huffmantree)  #actual text in string
+        decoded_file.write(bytes(decompressed_text,"utf8"))         #string to bytes
+
+
+
+
+
 
 #main
 filename="./LoremIpsumLong.rtf"
-huffmanencodefile(filename)
+huffmantree = huffmanencodefile(filename)
 
-#huffmandecodefile(filename + ".huf") #uncomment once this file is written
-
-
-
-
-
+huffmandecodefile(filename + ".huf", huffmantree) #uncomment once this file is written
