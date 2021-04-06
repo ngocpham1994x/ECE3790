@@ -1,38 +1,48 @@
-import bitstring as bitstring
-import numpy as np
 import sys
-import math
 import copy
 import heapq
 import operator #for sorting lists of classes by attribute
 import bitstring
+import math
+import numpy as np
 from timeit import default_timer as timer
 from datetime import timedelta
 
+"""
+The program takes in a rtf file type and compresses it to .huf using Huffman tree & prefix rule. 
+Then the program decompresses the compressed file to retrieve the original file by using the previous coded Huffman tree to decode. 
+There are six main methods in this program, two of them are main methods for calling compression (encode) and decompression (decode).
+Notes: 
+byte-read 'rb' & byte-rite 'wb' are used instead regular read & write.
+padding is used to handle the case where encoded bitstring is not divisible to 8 (as in 8 bits = 1 byte).
+Character map (Huffman tree) is printed in console.
+Compression ratio is printed in console at the end of program.
+"""
+
 class HuffmanNode:
     """Huffman encoding tree node"""
-    
+
     character = -1      #the character represented
     index = -1          #index of character (integer)
     count = -1          #character frequency (count) in the file
     left = []           #left child node
     right = []          #right child node
     code = bitstring.BitString()    #bitstring code for the character
-    
+
     #constructor
     def __init__(self,character):
         self.character = character;
         self.index = int.from_bytes(self.character, sys.byteorder)
         self.count = 0
-    
+
     #for printing
     def __repr__(self):
         return str("Huffman Node") + str(self.__dict__)
-        
+
     #for printing
     def __str__(self):
         return str("Huffman Node") + str(self.__dict__)
-        
+
     #comparison operator required for heapq comparison
     def __lt__(self, other):
         return self.count < other.count
@@ -55,11 +65,11 @@ def getfilecharactercounts(filename):
 
     f = open(filename,"rb")
     nodes = [];
-    
+
     #for every character of interest (and then some) create a huffman node
     for i in range(0,256):
         nodes.append(HuffmanNode(bytes([i]))) #works in python 3
-    
+
     #loop over file reading a character at a time and increment the count
     #of that character in the list of huffman nodes
     while True:
@@ -72,15 +82,15 @@ def getfilecharactercounts(filename):
             break
 
     f.close()
-    
+
     #mark and delete any characters that don't occur in the file
     #i.e., nodes should be as long as the number of unique characters in the file (not 256 things long)
     #Hint: Eliminate zero counts, sorting may help.
 
     nodes.sort(key=operator.attrgetter('count'))
-    nodes = [item for item in nodes if item.count != 0];
+    nodes = [item for item in nodes if item.count != 0]
     # for item in nodes:
-    #     print(item)
+    #     print(item)   #test print
     # print(len(nodes))
     return nodes
 
@@ -111,7 +121,7 @@ def codehuffmantree(huffmantreenode, nodecode):
     """ Traverse Huffman Tree to produce Prefix Codes"""
     #huffmantreenode.print()
     #print("Nodecode = ", nodecode)
-    
+
     if (huffmantreenode.left == [] and huffmantreenode.right == []):
         huffmantreenode.code = nodecode     #no children - assign code
     else:
@@ -145,7 +155,7 @@ def huffmanencodefile(filename):
 
     for i in range(0,256):
         if codelist[i] != None:
-            print(i, "character ", chr(i), " maps to code ", codelist[i].bin)
+            print("ascii decimal =", i, "character ", chr(i), " maps to code ", codelist[i].bin)
 
 
     #encode the file
@@ -163,8 +173,10 @@ def huffmanencodefile(filename):
     #write the file
     #Write the bitstring (and any additional information necessary) to file
 
-    #INCORRECT COMPRESSION:
-    # with open(filename + "WRONG.huf", 'wb') as coded_file:
+    #INCORRECT COMPRESSION - DO NOT USE - UNCOMMENT FOR UNDERSTANDING PURPOSE ONLY:
+    #These codes write string characters "1" and "0" to encoded file instead of encoded hex byte-type data (because of 'wb' write-byte)
+    #The encoded file will result in bigger size than original file
+    # with open(filename + "WRONG_COMPRESSED.huf", 'wb') as coded_file:
     #     coded_file.write(bytearray(filecode.bin,"utf8"))
 
     def pad_encoded_text(encoded_text):
@@ -172,8 +184,8 @@ def huffmanencodefile(filename):
         for i in range(extra_padding):
             encoded_text += "0"                     #pad at the end
 
-        padded_info = "{0:08b}".format(extra_padding)
-        encoded_text = padded_info + encoded_text   #pad at front
+        padding_information = "{0:08b}".format(extra_padding)
+        encoded_text = padding_information + encoded_text   #pad at front, for retrieving info when decoding
         return encoded_text
 
     def get_byte_array(padded_encoded_text):
@@ -187,10 +199,10 @@ def huffmanencodefile(filename):
             the_byte.append(int(byte, 2))
         return the_byte
 
-    with open(filename + ".huf", 'wb') as coded_file:
-        encoded_text = filecode.bin
-        padded_encoded_text = pad_encoded_text(encoded_text)
-        byte_encoded_text = get_byte_array(padded_encoded_text)
+    with open(filename + "COMPRESSED.huf", 'wb') as coded_file:
+        encoded_text = filecode.bin                             #bitstring
+        padded_encoded_text = pad_encoded_text(encoded_text)    #padded bitstring
+        byte_encoded_text = get_byte_array(padded_encoded_text) #bytearray() for passing into write()
         coded_file.write(bytes(byte_encoded_text))
 
 
@@ -205,16 +217,15 @@ def huffmandecodefile(filename, huffmantree):
     # print(huffmantree)
 
     def remove_padding(padded_encoded_text):
-        padded_info = padded_encoded_text[:8]
-        extra_padding = int(padded_info, 2)
+        padding_infomation = padded_encoded_text[:8]    #retrieving padding information
+        extra_padding = int(padding_infomation, 2)
 
-        padded_encoded_text = padded_encoded_text[8:]
-        encoded_text = padded_encoded_text[:-1*extra_padding]
+        padded_encoded_text = padded_encoded_text[8:]   #remove padding bits at front
+        encoded_text = padded_encoded_text[:-1*extra_padding]   #removing padding bits at end
 
         return encoded_text
 
     def decode_text(encoded_text, huffmantree):
-        # current_code = ""
         decoded_text = ""
         current_node = huffmantree
 
@@ -242,18 +253,25 @@ def huffmandecodefile(filename, huffmantree):
             else:
                 break #eof
 
-    with open(filename + "DECODED.rtf", 'wb') as decoded_file:
-        encoded_text = remove_padding(bitstring)
-        decompressed_text = decode_text(encoded_text, huffmantree)  #actual text in string
-        decoded_file.write(bytes(decompressed_text,"utf8"))         #string to bytes
+    with open(filename + "DECOMPRESSED.rtf", 'wb') as decoded_file:
+        encoded_text = remove_padding(bitstring)                    #bitsting
+        decompressed_text = decode_text(encoded_text, huffmantree)  #actual ascii chars as concatenated string
+        decoded_file.write(bytes(decompressed_text,"utf8"))         #string to bytes to pass in write()
 
-
-
+    print()
+    print("bits before = ", len(decompressed_text)*8, "bits")
+    print("bits after = ",len(encoded_text), "bits")
+    compression_ratio = len(decompressed_text)*8 / len(encoded_text)
+    print("compression ratio: bits before / bits after = ", len(decompressed_text)*8, "/", len(encoded_text), "=", compression_ratio)
 
 
 
 #main
 filename="./LoremIpsumLong.rtf"
+
 huffmantree = huffmanencodefile(filename)
 
-huffmandecodefile(filename + ".huf", huffmantree) #uncomment once this file is written
+huffmandecodefile(filename + "COMPRESSED.huf", huffmantree)
+
+
+#Reference: https://bhrigu.me/post/huffman-coding-python-implementation/
