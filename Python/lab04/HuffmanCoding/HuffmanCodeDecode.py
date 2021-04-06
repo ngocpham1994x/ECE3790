@@ -7,6 +7,11 @@ import math
 import numpy as np
 from timeit import default_timer as timer
 from datetime import timedelta
+"""
+Student: Ngoc Pham
+Student number: 7891063
+Course: UManitoba ECE3790
+"""
 
 """
 The program takes in a rtf file type and compresses it to .huf using Huffman tree & prefix rule. 
@@ -274,4 +279,5 @@ huffmantree = huffmanencodefile(filename)
 huffmandecodefile(filename + "COMPRESSED.huf", huffmantree)
 
 
+#Reference: UManitoba ECE3790 course
 #Reference: https://bhrigu.me/post/huffman-coding-python-implementation/
